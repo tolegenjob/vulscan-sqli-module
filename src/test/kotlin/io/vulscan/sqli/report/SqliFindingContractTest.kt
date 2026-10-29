@@ -11,6 +11,7 @@ import io.vulscan.kit.contracts.FindingReportedPayload
 import io.vulscan.kit.contracts.HttpMethod
 import io.vulscan.kit.contracts.Json
 import io.vulscan.kit.contracts.MessageType
+import io.vulscan.kit.contracts.SqliDetails
 import io.vulscan.kit.contracts.Verdict
 import io.vulscan.kit.net.ProbeRequest
 import io.vulscan.kit.worker.FindingSanitizer
@@ -127,7 +128,7 @@ class SqliFindingContractTest {
         assertThat(finding).isNotNull
         assertThat(errors(finding!!)).isEmpty()
         assertThat(finding.verdict.name).isEqualTo("CONFIRMED")
-        assertThat(finding.details.methodsConfirmed).containsExactlyInAnyOrder("BOOLEAN_BASED", "TIME_BASED")
+        assertThat((finding.details as SqliDetails).methodsConfirmed).containsExactlyInAnyOrder("BOOLEAN_BASED", "TIME_BASED")
     }
 
     @Test
