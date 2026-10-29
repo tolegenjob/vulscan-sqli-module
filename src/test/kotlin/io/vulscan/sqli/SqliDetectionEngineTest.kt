@@ -18,10 +18,12 @@ class SqliDetectionEngineTest {
 
     @Test
     fun `non idempotent endpoints receive no requests and are reported as skipped`() {
-        val unsafe = endpoint(idempotent = false)
+        val unsafe = endpoint(url = "${TestJobs.BASE}/unsafe/update", idempotent = false)
         val run = TestRun(TestJobs.job(unsafe, endpoint())) { TestJobs.response("ok") }
         SqliDetectionEngine().run(run.ctx)
-        assertThat(run.requests.none { it.url.contains("sqli/search") && false }).isTrue()
-        assertThat(run.stats.snapshot(0, 0).endpointsSkipped.map { it.reason }).containsExactly("NOT_IDEMPOTENT")
+        assertThat(run.requests.filter { it.url.contains("/unsafe/") }).isEmpty()
+        val skipped = run.stats.snapshot(0, 0).endpointsSkipped
+        assertThat(skipped.map { it.reason }).containsExactly("NOT_IDEMPOTENT")
+        assertThat(skipped.single().endpointId).isEqualTo(unsafe.endpointId)
     }
 }
