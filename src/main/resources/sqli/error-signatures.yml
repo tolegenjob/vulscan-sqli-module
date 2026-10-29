@@ -1,0 +1,77 @@
+# Каталог сигнатур ошибок СУБД (Q-3). Каждая запись: уникальный id, СУБД (null — общая JDBC/ODBC-подпись,
+# не используется для определения dbms), regex (матчится без учёта регистра, если это указано явно в самом
+# паттерне через (?i)) и weight — вклад в DbmsFingerprint и в порог CONFIRMED у ErrorBasedDetector.
+# `sample` — эталонный текст для ErrorSignatureCatalogTest (каждая запись обязана матчить свой sample).
+signatures:
+  - id: postgres-syntax-error
+    dbms: POSTGRESQL
+    weight: 8
+    regex: "(?i)syntax error at or near"
+    sample: "ERROR: syntax error at or near \"'\" at character 42"
+  - id: postgres-unterminated-string
+    dbms: POSTGRESQL
+    weight: 7
+    regex: "(?i)unterminated quoted string"
+    sample: "ERROR: unterminated quoted string at or near \"'foo\""
+  - id: postgres-exception-class
+    dbms: POSTGRESQL
+    weight: 9
+    regex: "PSQLException"
+    sample: "org.postgresql.util.PSQLException: ERROR: syntax error at or near \"'\""
+  - id: postgres-pg-query
+    dbms: POSTGRESQL
+    weight: 6
+    regex: "(?i)pg_query\\(\\)"
+    sample: "Warning: pg_query(): Query failed: ERROR: syntax error at or near \"'\""
+  # Полная типовая строка MySQL/MariaDB содержит обе фразы подряд — требуем именно это сочетание,
+  # иначе страница документации, которая просто ЦИТИРУЕТ первую фразу, тоже матчилась бы (ложный срабатыватель).
+  - id: mysql-syntax-error
+    dbms: MYSQL
+    weight: 9
+    regex: "(?i)you have an error in your sql syntax;\\s*check the manual"
+    sample: "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version"
+  - id: mysql-check-manual
+    dbms: MYSQL
+    weight: 6
+    regex: "(?i)check the manual that corresponds to your (mysql|mariadb) server version"
+    sample: "...check the manual that corresponds to your MariaDB server version for the right syntax to use"
+  - id: mssql-unclosed-quote
+    dbms: MSSQL
+    weight: 8
+    regex: "(?i)unclosed quotation mark"
+    sample: "Unclosed quotation mark after the character string ''."
+  - id: mssql-incorrect-syntax
+    dbms: MSSQL
+    weight: 7
+    regex: "(?i)incorrect syntax near"
+    sample: "Incorrect syntax near '''."
+  - id: oracle-ora-code
+    dbms: ORACLE
+    weight: 8
+    regex: "ORA-0\\d{4}"
+    sample: "ORA-00933: SQL command not properly ended"
+  - id: oracle-unterminated-string
+    dbms: ORACLE
+    weight: 7
+    regex: "(?i)quoted string not properly terminated"
+    sample: "ORA-01756: quoted string not properly terminated"
+  - id: sqlite-unrecognized-token
+    dbms: SQLITE
+    weight: 6
+    regex: "(?i)unrecognized token"
+    sample: "[SQLITE_ERROR] SQL error or missing database (unrecognized token: \"'\")"
+  - id: sqlite-error-code
+    dbms: SQLITE
+    weight: 9
+    regex: "SQLITE_ERROR"
+    sample: "org.sqlite.SQLiteException: [SQLITE_ERROR] near \"'\": syntax error"
+  - id: generic-jdbc-exception
+    dbms: null
+    weight: 3
+    regex: "(?i)java\\.sql\\.SQLException"
+    sample: "java.sql.SQLException: unexpected token at line 1"
+  - id: generic-odbc-error
+    dbms: null
+    weight: 3
+    regex: "(?i)\\[ODBC (Driver|SQL Server) Manager\\]"
+    sample: "[Microsoft][ODBC Driver Manager] Data source name not found"

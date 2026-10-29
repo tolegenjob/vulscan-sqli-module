@@ -33,6 +33,7 @@ dependencies {
     implementation("io.vulscan:contracts:${property("kitVersion")}")
     implementation("io.vulscan:net:${property("kitVersion")}")
     implementation("io.vulscan:worker:${property("kitVersion")}")
+    implementation("org.yaml:snakeyaml")
     runtimeOnly(libs.logback.classic)
 
     testImplementation(libs.junit.jupiter)
